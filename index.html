@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grade 2 Math Challenge</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      margin: 0;
+      padding: 20px;
+      color: #222;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 28px;
+    }
+
+    .progress {
+      margin-bottom: 18px;
+      font-weight: bold;
+    }
+
+    .question-box {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 20px;
+      background: #fafafa;
+      min-height: 260px;
+    }
+
+    .question-text {
+      font-size: 1.2rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .choices {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .choice {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+      background: white;
+      transition: 0.2s;
+    }
+
+    .choice:hover {
+      background: #eef5ff;
+      border-color: #4a90e2;
+    }
+
+    .choice input {
+      margin-right: 10px;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 24px;
+      gap: 12px;
+    }
+
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    .prev-btn {
+      background: #ddd;
+    }
+
+    .next-btn {
+      background: #2563eb;
+      color: white;
+    }
+
+    .submit-btn {
+      background: #16a34a;
+      color: white;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    .result {
+      margin-top: 24px;
+      padding: 16px;
+      border-radius: 10px;
+      background: #eefbf1;
+      border: 1px solid #9ad9aa;
+      display: none;
+    }
+
+    .answer-review {
+      margin-top: 20px;
+    }
+
+    .correct {
+      color: green;
+      font-weight: bold;
+    }
+
+    .incorrect {
+      color: red;
+      font-weight: bold;
+    }
+
+    @media (max-width: 600px) {
+      .buttons {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Interactive Grade 2 Math Challenge</h1>
+    <p class="subtitle">Converted from the Spring 2021 Noetic Learning Mathematics Contest PDF</p>
+
+    <div class="progress" id="progress"></div>
+
+    <div class="question-box">
+      <div class="question-text" id="question"></div>
+      <div class="choices" id="choices"></div>
+    </div>
+
+    <div class="buttons">
+      <button class="prev-btn" onclick="prevQuestion()">Previous</button>
+      <button class="next-btn" onclick="nextQuestion()">Next</button>
+    </div>
+
+    <button class="submit-btn" onclick="submitQuiz()">Submit Quiz</button>
+
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: '1) What is 20 + 21?',
+        choices: ['39', '40', '41', '42'],
+        answer: '41'
+      },
+      {
+        question: '2) Olivia set up bowling pins in rows of 1, 2, 3, and 4. How many bowling pins are there?',
+        choices: ['8', '9', '10', '11'],
+        answer: '10'
+      },
+      {
+        question: '3) How many more even numbers are in Box A than in Box B?',
+        choices: ['1', '2', '3', '4'],
+        answer: '2'
+      },
+      {
+        question: '4) Mrs. Garcia graded half of her tests at school and the remaining 14 at home. How many tests did she grade total?',
+        choices: ['14', '24', '28', '32'],
+        answer: '28'
+      },
+      {
+        question: '5) Abby made 10 cards in the first hour, 12 in the second, and 14 in the third. How many cards total?',
+        choices: ['34', '35', '36', '38'],
+        answer: '36'
+      },
+      {
+        question: '6) In the given April calendar, how many Fridays are between the first Monday and last Monday?',
+        choices: ['2', '3', '4', '5'],
+        answer: '3'
+      },
+      {
+        question: '7) Wheat flour costs $1/lb, rice $2/lb, almond $3/lb. If Mikal buys 2 pounds of each, what is the total cost?',
+        choices: ['$10', '$11', '$12', '$13'],
+        answer: '$12'
+      },
+      {
+        question: '8) Two small tokens are worth $4. One small token and one large token together are worth $5. How much is one large token worth?',
+        choices: ['$1', '$2', '$3', '$4'],
+        answer: '$3'
+      },
+      {
+        question: '9) Jamal needs 15 points per level. How many points are needed to advance from level 1 to level 4?',
+        choices: ['30', '45', '50', '60'],
+        answer: '45'
+      },
+      {
+        question: '10) At least how many more stars must be added to a 5x5 grid so every row and column has a star?',
+        choices: ['2', '3', '4', '5'],
+        answer: '3'
+      },
+      {
+        question: '11) Tara arrived at 10:15. Melina arrived 6 minutes later. Ken arrived 7 minutes before Melina. When did Ken arrive?',
+        choices: ['10:12', '10:14', '10:15', '10:21'],
+        answer: '10:14'
+      },
+      {
+        question: '12) In the logic grid puzzle, what number should replace the question mark?',
+        choices: ['1', '2', '3', '4'],
+        answer: '2'
+      },
+      {
+        question: '13) Rob and Sofia swam 40 laps total. Sofia swam 10 more than Rob. How many laps did Rob swim?',
+        choices: ['10', '15', '20', '25'],
+        answer: '15'
+      },
+      {
+        question: '14) Three equal balls balance two 45-gram weights. How much does each ball weigh?',
+        choices: ['15 grams', '20 grams', '30 grams', '45 grams'],
+        answer: '30 grams'
+      },
+      {
+        question: '15) A shuttle leaves every 15 minutes from 10:00 AM through 2:00 PM inclusive. How many shuttles leave?',
+        choices: ['16', '17', '18', '20'],
+        answer: '17'
+      },
+      {
+        question: '16) Five players are dealt 52 cards clockwise one at a time starting with Player A. Which player gets the last card?',
+        choices: ['Player A', 'Player B', 'Player C', 'Player E'],
+        answer: 'Player B'
+      },
+      {
+        question: '17) Aiden earns 1 sticker for every 6 miles. He has run 42 miles. How many stickers has he earned?',
+        choices: ['6', '7', '8', '9'],
+        answer: '7'
+      },
+      {
+        question: '18) After painting the cube structure, how many cubes are painted on exactly 3 sides?',
+        choices: ['2', '3', '4', '5'],
+        answer: '4'
+      },
+      {
+        question: '19) Shea has 3 bows and 2 puppies. Each puppy gets one bow. How many different ways can she assign bows?',
+        choices: ['3', '4', '6', '9'],
+        answer: '6'
+      },
+      {
+        question: '20) There are 27 children. 18 play soccer. There are 15 girls and 11 girls play soccer. How many boys play basketball?',
+        choices: ['4', '5', '6', '7'],
+        answer: '5'
+      }
+    ];
+
+    let currentQuestion = 0;
+    let userAnswers = new Array(questions.length).fill(null);
+
+    function renderQuestion() {
+      const q = questions[currentQuestion];
+
+      document.getElementById('progress').innerText = `Question ${currentQuestion + 1} of ${questions.length}`;
+      document.getElementById('question').innerText = q.question;
+
+      const choicesContainer = document.getElementById('choices');
+      choicesContainer.innerHTML = '';
+
+      q.choices.forEach(choice => {
+        const label = document.createElement('label');
+        label.className = 'choice';
+
+        label.innerHTML = `
+          <input type="radio" name="choice" value="${choice}" ${userAnswers[currentQuestion] === choice ? 'checked' : ''}>
+          ${choice}
+        `;
+
+        choicesContainer.appendChild(label);
+      });
+
+      document.querySelectorAll('input[name="choice"]').forEach(input => {
+        input.addEventListener('change', (e) => {
+          userAnswers[currentQuestion] = e.target.value;
+        });
+      });
+    }
+
+    function nextQuestion() {
+      if (currentQuestion < questions.length - 1) {
+        currentQuestion++;
+        renderQuestion();
+      }
+    }
+
+    function prevQuestion() {
+      if (currentQuestion > 0) {
+        currentQuestion--;
+        renderQuestion();
+      }
+    }
+
+    function submitQuiz() {
+      let score = 0;
+      let reviewHtml = '<h2>Quiz Results</h2>';
+
+      questions.forEach((q, index) => {
+        const userAnswer = userAnswers[index];
+        const isCorrect = userAnswer === q.answer;
+
+        if (isCorrect) score++;
+
+        reviewHtml += `
+          <div class="answer-review">
+            <strong>Q${index + 1}:</strong> ${q.question}<br>
+            Your answer: <span class="${isCorrect ? 'correct' : 'incorrect'}">${userAnswer || 'No answer'}</span><br>
+            Correct answer: <strong>${q.answer}</strong>
+          </div>
+        `;
+      });
+
+      reviewHtml = `
+        <h2>Your Score: ${score} / ${questions.length}</h2>
+        ${reviewHtml}
+      `;
+
+      const resultDiv = document.getElementById('result');
+      resultDiv.style.display = 'block';
+      resultDiv.innerHTML = reviewHtml;
+
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    renderQuestion();
+  </script>
+</body>
+</html>
